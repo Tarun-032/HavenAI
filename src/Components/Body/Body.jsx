@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { FaMicrophone, FaRobot, FaHeartbeat, FaDatabase, FaMicrophoneAlt, FaBrain, FaComments } from 'react-icons/fa';
 import './Body.css';
 import Reviewcarousel from './Reviewcarousal/Reviewcarousal';
+import FAQ from './FAQ/FAQ';
 
 import photo from '../../assets/photoai.png'
 
@@ -63,6 +64,7 @@ const Body = () => {
       </div>
       <section className="review-section">
         <Reviewcarousel />
+        <FAQ />
       </section>
       </main>
       
