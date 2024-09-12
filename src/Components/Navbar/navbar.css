@@ -43,3 +43,19 @@
   .navbar-menu a:hover {
     color: #0088cc;
   }
+
+  .login-button a {
+    background-color: #007bff; /* Blue background color */
+    color: white; /* White text color */
+    padding: 0.7rem 1.5rem; /* Increased padding for a bigger button */
+    border-radius: 25px; /* Slightly more rounded corners */
+    font-size: 1.1rem; /* Slightly larger font size */
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Added transition for a hover effect */
+  }
+  
+  .login-button a:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    transform: scale(1.05); /* Slightly enlarges the button on hover */
+  }

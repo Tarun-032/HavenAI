@@ -1,7 +1,6 @@
 import React from 'react';
-import './navbar.css'; // We'll create this CSS file next
-
-import Logo from '../../../src/assets/Logo2.png'
+import './navbar.css';
+import Logo from '../../../src/assets/Logo2.png';
 
 const Navbar = () => {
   return (
@@ -11,10 +10,14 @@ const Navbar = () => {
           <img src={Logo} alt="Logo" className="logo" />
         </div>
         <ul className="navbar-menu">
-          <li><a href="#affiliates">Affiliates</a></li>
-          <li><a href="#docs">Docs</a></li>
-          <li><a href="#price">Price</a></li>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#resources">Resources</a></li>
           <li><a href="#history">History</a></li>
+          <li>
+            <div className="login-button">
+              <a href="#login">Login</a>
+            </div>
+          </li>
         </ul>
       </div>
     </nav>
