@@ -1,4 +1,6 @@
+// src/Components/Navbar/Navbar.jsx
 import React from 'react';
+import { Link } from 'react-router-dom'; // Import Link for navigation
 import './navbar.css';
 import Logo from '../../../src/assets/Logo2.png';
 
@@ -15,7 +17,8 @@ const Navbar = () => {
           <li><a href="#history">History</a></li>
           <li>
             <div className="login-button">
-              <a href="#login">Login</a>
+              {/* Use Link to navigate to login route */}
+              <Link to="/login">Login</Link>
             </div>
           </li>
         </ul>
