@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './login.css';
+import Logo from '../../../src/assets/Logo2.png';
+import Video from '../../../src/assets/login-background.mp4';
+
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -20,20 +23,20 @@ function Login() {
     <div className="login-container">
       {/* Left side with video and text */}
       <div className="login-left">
-        <video autoPlay muted loop className="background-video">
-          <source src="your-video-file.mp4" type="video/mp4" />
+        <video autoPlay muted loop className="login-background-video">
+          <source src={Video} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         <div className="text-overlay">
-          <h1>Enhance Efficiency with Our Dashboard</h1>
-          <p>Stay organized in law enforcement!</p>
+          <h1>HavenAI</h1>
+          <p>An Emotionally Intelligent Voice AI</p>
         </div>
       </div>
 
       {/* Right side with login form */}
       <div className="login-right">
         <div className="login-logo">
-          <img src="your-logo.png" alt="KSP" />
+          <img src={Logo} alt="Logo" />
         </div>
         <h2>Welcome Back</h2>
         <form onSubmit={handleLogin}>

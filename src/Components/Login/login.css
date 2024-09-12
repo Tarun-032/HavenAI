@@ -1,8 +1,10 @@
-/* Container styling for the login page */
-.login-container {
+  .login-container {
     display: flex;
-    width: 100vw;
-    height: 100vh;
+    width: 65vw;
+    height: 85vh;
+    border-radius: 10px; /* Optional: Add border radius */
+    overflow: hidden; /* Optional: Hide overflow */
+    margin: auto; /* Optional: Ensure container stays centered */
   }
   
   /* Left side: video and overlay text */
@@ -12,7 +14,7 @@
     background: black;
   }
   
-  .background-video {
+  .login-background-video {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -51,7 +53,8 @@
   }
   
   .login-logo img {
-    width: 50px;
+    width: 125px;
+    height: auto;
     margin-bottom: 1rem;
   }
   
@@ -85,7 +88,7 @@
   .login-btn {
     width: 100%;
     padding: 0.8rem;
-    background-color: #28a745;
+    background-color: #488bd3;
     color: white;
     border: none;
     border-radius: 5px;
@@ -94,7 +97,7 @@
   }
   
   .login-btn:hover {
-    background-color: #218838;
+    background-color: #18579a;
   }
   
   .forgot-password {
