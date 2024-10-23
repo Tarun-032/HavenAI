@@ -6,9 +6,7 @@ import subprocess
 import os
 import uuid
 import logging
-import whisper 
-
-from gtts import gTTS  # gTTS for text-to-speech
+import pyttsx3  # Text-to-speech
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -24,16 +22,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Function to transcribe audio using Whisper
-def transcribe_audio(audio_file):
-    model = whisper.load_model("base")  # Load the Whisper model
-    result = model.transcribe(audio_file)
-    return result['text']
-
-# Function to convert text to speech using gTTS
-def text_to_speech(text, output_filename):
-    tts = gTTS(text=text, lang='en')
-    tts.save(output_filename)
+def clean_response(text: str) -> str:
+    """Clean the response text by removing console mode warnings."""
+    if not text:
+        return ""
+    
+    # List of warning patterns to remove
+    warnings = [
+        "failed to get console mode for stdout: The handle is invalid.",
+        "failed to get console mode for stderr: The handle is invalid.",
+        "The handle is invalid."
+    ]
+    
+    cleaned_text = text
+    for warning in warnings:
+        cleaned_text = cleaned_text.replace(warning, "")
+    
+    # Remove any extra whitespace and trim
+    cleaned_text = " ".join(cleaned_text.split())
+    return cleaned_text.strip()
 
 @app.post("/run-model")
 async def run_model(file: UploadFile = File(...)):
@@ -46,35 +53,46 @@ async def run_model(file: UploadFile = File(...)):
             shutil.copyfileobj(file.file, buffer)
         logger.info(f"Saved input file: {input_filename}")
 
-        # Step 1: Transcribe audio using Whisper
+        # Transcribe the audio (using Whisper or any STT model)
         logger.info("Transcribing audio")
-        transcribed_text = transcribe_audio(input_filename)
+        result = subprocess.run(
+            ["whisper", input_filename, "--language", "en"],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        transcribed_text = result.stdout.strip()
         logger.info(f"Transcribed text: {transcribed_text}")
 
-        # Step 2: Run the Ollama model with the transcribed text
-        logger.info("Running Ollama model")
-        result = subprocess.run(
+        # Run the LLM model (Ollama, etc.)
+        logger.info("Running LLM model")
+        model_result = subprocess.run(
             ["ollama", "run", "HavenAI", f"Respond to this text: {transcribed_text}"],
             capture_output=True,
             text=True,
             check=True
         )
-        response_text = result.stdout.strip()
-        logger.info(f"Ollama model response: {response_text}")
+        # Clean the response text before processing
+        response_text = clean_response(model_result.stdout.strip())
+        logger.info(f"Clean model response: {response_text}")
 
-        # Step 3: Convert the response text to audio using gTTS
-        logger.info("Converting response text to speech")
-        text_to_speech(response_text, output_filename)
-        logger.info(f"Created output file: {output_filename}")
+        # Convert clean response to speech using pyttsx3
+        if response_text:
+            logger.info("Converting clean response text to speech")
+            engine = pyttsx3.init()
+            engine.save_to_file(response_text, output_filename)
+            engine.runAndWait()
+            logger.info(f"Created output file: {output_filename}")
 
-        # Return the response text and the path to the output audio file
+        # Return the clean response text and the path to the output audio file
         return {
             "response_text": response_text,
             "audio_file": output_filename
         }
     except subprocess.CalledProcessError as e:
-        logger.error(f"Error running Ollama model: {e.stderr}")
-        raise HTTPException(status_code=500, detail=f"Error running Ollama model: {e.stderr}")
+        error_message = clean_response(e.stderr)  # Clean error messages too
+        logger.error(f"Error running model: {error_message}")
+        raise HTTPException(status_code=500, detail=f"Error running model: {error_message}")
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
@@ -90,7 +108,6 @@ async def get_audio(filename: str):
         logger.error(f"Audio file not found: {filename}")
         raise HTTPException(status_code=404, detail="Audio file not found")
     return FileResponse(filename)
-
 
 if __name__ == "__main__":
     import uvicorn

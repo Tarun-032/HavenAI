@@ -21,12 +21,33 @@ const Body = () => {
   const [audioUrl, setAudioUrl] = useState(null);
   const [error, setError] = useState(null);
 
+   // Enhanced helper function to clean model response
+   const cleanModelResponse = (response) => {
+    if (!response) return '';
+    
+    // Remove all variations of the console mode warning
+    const warnings = [
+      /failed to get console mode for stdout: The handle is invalid\./ig,
+      /failed to get console mode for stderr: The handle is invalid\./ig,
+      /The handle is invalid\./ig,
+      /console mode/ig
+    ];
+    
+    let cleanedResponse = response;
+    warnings.forEach(warning => {
+      cleanedResponse = cleanedResponse.replace(warning, '');
+    });
+    
+    // Clean up any multiple spaces and trim
+    return cleanedResponse.replace(/\s+/g, ' ').trim();
+  };
+
   const handleMicClick = async () => {
     if (!isRecording) {
       setIsRecording(true);
       setCaptions('Listening...');
       setError(null);
-      
+
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         const mediaRecorder = new MediaRecorder(stream);
@@ -42,9 +63,13 @@ const Body = () => {
           formData.append('file', audioBlob, 'input_audio.wav');
 
           try {
+            // Send the clean response flag to backend
             const response = await fetch('http://localhost:8000/run-model', {
               method: 'POST',
               body: formData,
+              headers: {
+                'Clean-Response': 'true'  // Add this header to signal backend
+              }
             });
 
             if (!response.ok) {
@@ -52,14 +77,25 @@ const Body = () => {
             }
 
             const data = await response.json();
-            console.log('Response data:', data);  // Log the response data
-
+            
             if (data.error) {
               throw new Error(data.error);
             }
 
-            setCaptions(data.response_text);
-            setAudioUrl(`http://localhost:8000/audio/${data.audio_file}`);
+            // Clean the response text
+            const cleanedResponse = cleanModelResponse(data.response_text);
+            
+            // Only update captions and play audio if we have a valid cleaned response
+            if (cleanedResponse) {
+              setCaptions(cleanedResponse);
+              
+              if (data.audio_file) {
+                const audioFileUrl = `http://localhost:8000/audio/${data.audio_file}`;
+                setAudioUrl(audioFileUrl);
+                playResponse(audioFileUrl);
+              }
+            }
+
           } catch (error) {
             console.error('Error processing audio:', error);
             setError(`Error processing audio: ${error.message}`);
@@ -72,6 +108,7 @@ const Body = () => {
           mediaRecorder.stop();
           setIsRecording(false);
         }, 5000);
+
       } catch (error) {
         console.error('Error accessing microphone:', error);
         setError(`Error accessing microphone: ${error.message}`);
@@ -81,15 +118,17 @@ const Body = () => {
     }
   };
 
-  const playResponse = () => {
-    if (audioUrl) {
-      const audio = new Audio(audioUrl);
+  const playResponse = (audioFileUrl) => {
+    if (audioFileUrl) {
+      const audio = new Audio(audioFileUrl);
       audio.play().catch(error => {
         console.error('Error playing audio:', error);
         setError(`Error playing audio: ${error.message}`);
       });
     }
   };
+
+  
 
 
   const features = [
