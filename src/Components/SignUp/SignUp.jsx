@@ -1,28 +1,32 @@
-// src/Components/Login/Login.jsx
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import './login.css';
+import { useNavigate } from 'react-router-dom';
+import './signup.css';
 import Logo from '../../../src/assets/Logo2.png';
 import Video from '../../../src/assets/login-background.mp4';
 
-function Login() {
+function SignUp() {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleSignUp = (e) => {
     e.preventDefault();
-    // Replace with your authentication logic
-    if (username === 'admin' && password === 'password') {
-      navigate('/');
+    // Replace with your signup logic
+    if (password === confirmPassword) {
+      // Add signup logic here
+      navigate('/login'); // Redirect to login after successful sign up
+    } else {
+      alert('Passwords do not match!');
     }
   };
 
   return (
-    <div className="login-container">
+    <div className="signup-container">
       {/* Left side with video and text */}
-      <div className="login-left">
-        <video autoPlay muted loop className="login-background-video">
+      <div className="signup-left">
+        <video autoPlay muted loop className="signup-background-video">
           <source src={Video} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
@@ -32,13 +36,13 @@ function Login() {
         </div>
       </div>
 
-      {/* Right side with login form */}
-      <div className="login-right">
-        <div className="login-logo">
+      {/* Right side with sign-up form */}
+      <div className="signup-right">
+        <div className="signup-logo">
           <img src={Logo} alt="Logo" />
         </div>
-        <h2>Welcome Back</h2>
-        <form onSubmit={handleLogin}>
+        <h2>Create Account</h2>
+        <form onSubmit={handleSignUp}>
           <div className="input-group">
             <label htmlFor="username">Username</label>
             <input
@@ -47,6 +51,16 @@ function Login() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Enter Username"
+            />
+          </div>
+          <div className="input-group">
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter Email"
             />
           </div>
           <div className="input-group">
@@ -59,10 +73,9 @@ function Login() {
               placeholder="Enter Password"
             />
           </div>
-          <button type="submit" className="login-btn">Login</button>
-
-          <div className="signup-link">
-            <p>Don't have an account? <Link to="/signup">Sign Up</Link></p>
+          <button type="submit" className="signup-btn">Sign Up</button>
+          <div className="login-link">
+            <p>Already have an account? <a href="/login">Log In</a></p>
           </div>
         </form>
       </div>
@@ -70,4 +83,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default SignUp;

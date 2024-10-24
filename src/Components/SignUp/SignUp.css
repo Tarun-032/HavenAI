@@ -1,0 +1,152 @@
+/* Container */
+.signup-container {
+    display: flex;
+    width: 65vw;
+    height: 85vh;
+    border-radius: 15px; /* Updated to match the login container */
+    overflow: hidden;
+    margin: auto;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2); /* Soft shadow for consistency */
+    background-color: #ffffff; /* Added background for contrast */
+  }
+  
+  /* Left side: video and overlay text */
+  .signup-left {
+    flex: 1;
+    position: relative;
+    background: black;
+    border-top-left-radius: 15px; /* Round corners to match */
+    border-bottom-left-radius: 15px;
+    overflow: hidden;
+  }
+  
+  .signup-background-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  
+  .text-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+  }
+  
+  .text-overlay h1 {
+    font-size: 3rem; /* Updated for consistency */
+    margin-bottom: 1rem;
+    font-family: 'Poppins', sans-serif; /* Modern font */
+    letter-spacing: 2px; /* Spacing for a modern look */
+  }
+  
+  .text-overlay p {
+    font-size: 1.3rem; /* Updated for consistency */
+    font-family: 'Poppins', sans-serif; /* Added font family */
+  }
+  
+  /* Right side: signup form */
+  .signup-right {
+    flex: 1;
+    background-color: #f2f2f2; /* Softer, neutral background */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    border-top-right-radius: 15px; /* Round corners to match */
+    border-bottom-right-radius: 15px;
+  }
+  
+  .signup-logo img {
+    width: 130px; /* Slightly larger to match */
+    height: auto;
+    margin-bottom: 1.5rem; /* More space */
+  }
+  
+  h2 {
+    margin-bottom: 3rem; /* Increased margin for more space below */
+    font-size: 1.5rem; /* Larger font */
+    font-family: 'Poppins', sans-serif; /* Modern font */
+    color: #333; /* Darker text */
+  }
+  
+  /* Create Account heading - New class for size adjustment */
+  .create-account {
+    font-size: 1.5rem; /* Decreased font size */
+    font-family: 'Poppins', sans-serif; /* Added font family */
+    margin-bottom: 1.5rem; /* Space below */
+  }
+  
+  /* Input fields */
+  .input-group {
+    margin-bottom: 1.5rem;
+    width: 100%; /* Ensures full width */
+  }
+  
+  .input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500; /* Updated for consistency */
+    color: #555; /* Updated for consistency */
+    font-family: 'Poppins', sans-serif; /* Added font family */
+  }
+  
+  .input-group input {
+    width: 100%;
+    padding: 0.9rem; /* Increased padding for larger input fields */
+    border: 1px solid #ddd;
+    border-radius: 25px; /* Rounded corners to match */
+    background-color: #f9f9f9; /* Slightly off-white background */
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    font-family: 'Poppins', sans-serif;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .input-group input:focus {
+    background-color: #fff;
+    box-shadow: 0 0 8px rgba(72, 139, 211, 0.3); /* Subtle glow on focus */
+    outline: none; /* Remove default outline */
+  }
+  
+  /* Signup button */
+  .signup-btn {
+    width: 100%;
+    padding: 0.9rem; /* Increased padding for consistency */
+    background-color: #488bd3;
+    color: white;
+    border: none;
+    border-radius: 25px; /* Rounded corners to match */
+    cursor: pointer;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif; /* Added font family */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0px 5px 10px rgba(72, 139, 211, 0.2); /* Add button shadow */
+  }
+  
+  .signup-btn:hover {
+    background-color: #18579a;
+    transform: translateY(-3px); /* Slight hover lift */
+  }
+  
+  /* Login link - New class for size adjustment */
+  .login-link {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 1rem; /* Decreased font size */
+  }
+  
+  .login-link a {
+    color: #007bff;
+    text-decoration: none;
+    font-family: 'Poppins', sans-serif; /* Added font family */
+  }
+  
+  .login-link a:hover {
+    text-decoration: underline;
+  }

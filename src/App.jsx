@@ -6,13 +6,17 @@ import Videobackground from './Components/Videobackground/Videobackground';
 import Body from './Components/Body/Body';
 import Footer from './Components/Footer/Footer';
 import Login from './Components/Login/Login';
+import SignUp from './Components/SignUp/SignUp';
 import './App.css';
 
 import Video from './assets/background.mp4';
 
+// Layout component that shows/hides elements based on the route
 const Layout = ({ children }) => {
   const location = useLocation();
-  const hideLayoutComponents = location.pathname === '/login';
+  
+  // Hide the Navbar, Footer, and Video on /login and /signup pages
+  const hideLayoutComponents = location.pathname === '/login' || location.pathname === '/signup';
 
   return (
     <div className="app">
@@ -24,6 +28,7 @@ const Layout = ({ children }) => {
   );
 };
 
+// Main App component with Routes
 const App = () => {
   return (
     <Router>
@@ -35,6 +40,10 @@ const App = () => {
         <Route
           path="/login"
           element={<Layout><Login /></Layout>}
+        />
+        <Route
+          path="/signup"
+          element={<Layout><SignUp /></Layout>}
         />
       </Routes>
     </Router>
