@@ -1,4 +1,3 @@
-// src/Components/Login/Login.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './login.css';
@@ -10,17 +9,34 @@ function Login() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Replace with your authentication logic
-    if (username === 'admin' && password === 'password') {
-      navigate('/');
+ 
+    try {
+      const response = await fetch("http://localhost:8000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("token", data.access_token);
+        navigate('/');
+      } else {
+        const errorData = await response.json();
+        alert(errorData.detail || "Invalid credentials");
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+      alert("An error occurred during login. Please try again.");
     }
   };
-
+ 
   return (
     <div className="login-container">
-      {/* Left side with video and text */}
       <div className="login-left">
         <video autoPlay muted loop className="login-background-video">
           <source src={Video} type="video/mp4" />
@@ -31,8 +47,6 @@ function Login() {
           <p>An Emotionally Intelligent Voice AI</p>
         </div>
       </div>
-
-      {/* Right side with login form */}
       <div className="login-right">
         <div className="login-logo">
           <img src={Logo} alt="Logo" />
@@ -60,7 +74,6 @@ function Login() {
             />
           </div>
           <button type="submit" className="login-btn">Login</button>
-
           <div className="signup-link">
             <p>Don't have an account? <Link to="/signup">Sign Up</Link></p>
           </div>

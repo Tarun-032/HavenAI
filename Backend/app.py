@@ -1,6 +1,10 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from pymongo import MongoClient
+from passlib.context import CryptContext
+from pydantic import BaseModel
+from jose import jwt
 import shutil
 import subprocess
 import os
@@ -21,6 +25,64 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Password hashing configuration
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+SECRET_KEY = "cde07be619784cf0fbb8753080360255ed403377e690fc7f03b0b7ed38d0f5aa"
+
+# MongoDB connection
+client = MongoClient("mongodb+srv://Sanika:Sanika1234@cluster0.a8enq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+db = client['mydatabase']
+users_collection = db['users']
+
+# Authentication Models
+class User(BaseModel):
+    username: str
+    email: str
+    password: str
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+# Helper functions for password and token handling
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+def create_access_token(data: dict):
+    return jwt.encode(data, SECRET_KEY, algorithm="HS256")
+
+# Signup route
+@app.post("/signup")
+async def signup(user: User):
+    existing_user = users_collection.find_one({"username": user.username})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Username already exists")
+   
+    hashed_password = get_password_hash(user.password)
+    users_collection.insert_one({
+        "username": user.username,
+        "email": user.email,
+        "password": hashed_password
+    })
+    return {"message": "User created successfully"}
+
+# Login route
+@app.post("/login")
+async def login(user: UserLogin):
+    db_user = users_collection.find_one({"username": user.username})
+    if not db_user:
+        raise HTTPException(status_code=400, detail="User not found")
+    if not verify_password(user.password, db_user['password']):
+        raise HTTPException(status_code=400, detail="Invalid credentials")
+   
+    # Generate JWT token
+    access_token = create_access_token(data={"sub": user.username})
+    return {"access_token": access_token, "token_type": "bearer"}
+
 
 def clean_response(text: str) -> str:
     """Clean the response text by removing console mode warnings."""
