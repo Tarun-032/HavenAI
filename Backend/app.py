@@ -27,7 +27,6 @@ def clean_response(text: str) -> str:
     if not text:
         return ""
     
-    # List of warning patterns to remove
     warnings = [
         "failed to get console mode for stdout: The handle is invalid.",
         "failed to get console mode for stderr: The handle is invalid.",
@@ -38,7 +37,6 @@ def clean_response(text: str) -> str:
     for warning in warnings:
         cleaned_text = cleaned_text.replace(warning, "")
     
-    # Remove any extra whitespace and trim
     cleaned_text = " ".join(cleaned_text.split())
     return cleaned_text.strip()
 
@@ -48,15 +46,24 @@ async def run_model(file: UploadFile = File(...)):
     output_filename = f"output_{uuid.uuid4()}.wav"
 
     try:
-        # Save the uploaded audio file
-        with open(input_filename, "wb") as buffer:
+        # Save the uploaded audio file with an absolute path
+        input_file_path = os.path.abspath(input_filename)
+        with open(input_file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
-        logger.info(f"Saved input file: {input_filename}")
+        logger.info(f"Saved input file: {input_file_path}")
 
-        # Transcribe the audio (using Whisper or any STT model)
+        # Log the directory content to ensure file is present
+        logger.info(f"Files in current directory: {os.listdir(os.getcwd())}")
+
+        # Ensure the file exists before transcribing
+        if not os.path.exists(input_file_path):
+            logger.error(f"Input file not found: {input_file_path}")
+            raise HTTPException(status_code=404, detail="Input file not found")
+
+        # Transcribe the audio using Whisper
         logger.info("Transcribing audio")
         result = subprocess.run(
-            ["whisper", input_filename, "--language", "en"],
+            ["whisper", input_file_path, "--language", "en"],
             capture_output=True,
             text=True,
             check=True
@@ -72,7 +79,6 @@ async def run_model(file: UploadFile = File(...)):
             text=True,
             check=True
         )
-        # Clean the response text before processing
         response_text = clean_response(model_result.stdout.strip())
         logger.info(f"Clean model response: {response_text}")
 
@@ -84,13 +90,12 @@ async def run_model(file: UploadFile = File(...)):
             engine.runAndWait()
             logger.info(f"Created output file: {output_filename}")
 
-        # Return the clean response text and the path to the output audio file
         return {
             "response_text": response_text,
             "audio_file": output_filename
         }
     except subprocess.CalledProcessError as e:
-        error_message = clean_response(e.stderr)  # Clean error messages too
+        error_message = clean_response(e.stderr)
         logger.error(f"Error running model: {error_message}")
         raise HTTPException(status_code=500, detail=f"Error running model: {error_message}")
     except Exception as e:
@@ -98,9 +103,9 @@ async def run_model(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
     finally:
         # Clean up input file
-        if os.path.exists(input_filename):
-            os.remove(input_filename)
-            logger.info(f"Cleaned up input file: {input_filename}")
+        if os.path.exists(input_file_path):
+            os.remove(input_file_path)
+            logger.info(f"Cleaned up input file: {input_file_path}")
 
 @app.get("/audio/{filename}")
 async def get_audio(filename: str):
